@@ -294,9 +294,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <a href="manage_users.php" class="sidebar-link <?php echo $current_page == 'manage_users.php' ? 'active' : ''; ?>">
                 <i class="fas fa-users"></i> Customers
             </a>
-            <a href="../index.php" class="sidebar-link">
-                <i class="fas fa-external-link-alt"></i> Storefront
-            </a>
+           
         </nav>
         <div style="padding: 1.5rem;">
             <a href="../logout.php" class="sidebar-link" style="color: #ef4444; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">
