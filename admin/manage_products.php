@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/connection.php';
-require_once '../includes/auth.php';
+$page_title = 'Manage Products';
+require_once 'admin_header.php';
 
 // Handle Deletion
 if (isset($_GET['delete'])) {
@@ -18,96 +18,131 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-$sql = "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.created_at DESC";
+// Search and Filter
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+$category_filter = isset($_GET['category']) ? intval($_GET['category']) : 0;
+
+$where = "WHERE 1=1";
+if ($search) {
+    $where .= " AND (p.name LIKE '%$search%' OR p.description LIKE '%$search%')";
+}
+if ($category_filter) {
+    $where .= " AND p.category_id = $category_filter";
+}
+
+$sql = "SELECT p.*, c.name as category_name 
+        FROM products p 
+        LEFT JOIN categories c ON p.category_id = c.id 
+        $where 
+        ORDER BY p.created_at DESC";
 $result = $conn->query($sql);
+
+$categories = $conn->query("SELECT * FROM categories");
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Manage Products</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: var(--surface); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .admin-table th, .admin-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-        .admin-table th { background: #f3f4f6; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
-    </style>
-</head>
-<body>
-    <header class="glass-header">
-        <div class="logo">
-            <a href="dashboard.php">🛠️ Admin Panel</a>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="../index.php">Storefront</a></li>
-                <li><a href="manage_products.php" style="color: var(--primary);">Products</a></li>
-                <li><a href="add_product.php">Add Product</a></li>
-                <li><a href="manage_orders.php">Orders</a></li>
-                <li><a href="manage_users.php">Users</a></li>
-                <li><a href="../logout.php">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">Product Inventory</h2>
+        <p style="color: #64748b; font-size: 0.9rem;">Manage, add, and edit your store products.</p>
+    </div>
+    <a href="add_product.php" class="btn-fill" style="text-decoration:none; padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-plus"></i> Add New Product
+    </a>
+</div>
+
+<?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success" style="margin-bottom: 1.5rem;">Product deleted successfully.</div>
+<?php endif; ?>
+
+<form class="filter-bar" method="GET" action="">
+    <div style="position: relative; flex: 1; min-width: 250px;">
+        <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+        <input type="text" name="search" placeholder="Search products..." value="<?php echo htmlspecialchars($search); ?>" style="padding-left: 2.5rem; width: 100%;">
+    </div>
     
-    <main>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h2 class="page-title" style="margin: 0;">Manage Products</h2>
-            <a href="add_product.php" class="btn-fill" style="text-decoration:none;">+ Add New</a>
-        </div>
-        
-        <?php if (isset($_GET['success'])): ?>
-            <div class="alert alert-success">Product deleted successfully.</div>
-        <?php endif; ?>
-        
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Date Added</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
+    <select name="category">
+        <option value="0">All Categories</option>
+        <?php while($cat = $categories->fetch_assoc()): ?>
+            <option value="<?php echo $cat['id']; ?>" <?php echo $category_filter == $cat['id'] ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($cat['name']); ?>
+            </option>
+        <?php endwhile; ?>
+    </select>
+    
+    <button type="submit" class="btn-fill" style="padding: 0.6rem 1.5rem; border-radius: 8px;">Filter</button>
+    <?php if($search || $category_filter): ?>
+        <a href="manage_products.php" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">Clear</a>
+    <?php endif; ?>
+</form>
+
+<div style="overflow-x: auto;">
+    <table class="premium-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock Status</th>
+                <th>Added Date</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if($result->num_rows > 0): ?>
                 <?php while ($row = $result->fetch_assoc()): 
-                    $imgName = htmlspecialchars($row['image']);
+                    $imgName = $row['image'];
+                    $imagePath = 'https://via.placeholder.com/50?text=Img';
                     if (!empty($imgName)) {
-                        if (file_exists($imgName)) {
-                            $imagePath = $imgName;
-                        } elseif (file_exists('../uploads/' . $imgName)) {
-                            $imagePath = '../uploads/' . $imgName;
-                        } elseif (file_exists('../images/' . $imgName)) {
-                            $imagePath = '../images/' . $imgName;
-                        } elseif (file_exists('../images/products/' . $imgName)) {
-                            $imagePath = '../images/products/' . $imgName;
-                        } elseif (file_exists('../' . $imgName)) {
-                            $imagePath = '../' . $imgName;
-                        } else {
-                            $imagePath = 'https://via.placeholder.com/50?text=Img';
+                        $possiblePaths = [
+                            $imgName,
+                            '../uploads/' . $imgName,
+                            '../images/' . $imgName,
+                            '../' . $imgName
+                        ];
+                        foreach ($possiblePaths as $path) {
+                            if (file_exists($path)) {
+                                $imagePath = $path;
+                                break;
+                            }
                         }
-                    } else {
-                        $imagePath = 'https://via.placeholder.com/50?text=Img';
                     }
                 ?>
                 <tr>
-                    <td><?php echo $row['id']; ?></td>
-                    <td><img src="<?php echo $imagePath; ?>" alt="Product" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"></td>
-                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                    <td><?php echo htmlspecialchars($row['category_name']); ?></td>
-                    <td>$<?php echo number_format($row['price'], 2); ?></td>
-                    <td><?php echo date('M d, Y', strtotime($row['created_at'])); ?></td>
                     <td>
-                        <a href="edit_product.php?id=<?php echo $row['id']; ?>" style="color: var(--primary); text-decoration: none; margin-right: 0.5rem;">Edit</a>
-                        <a href="manage_products.php?delete=<?php echo $row['id']; ?>" style="color: var(--danger); text-decoration: none;" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <img src="<?php echo $imagePath; ?>" alt="" style="width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <div>
+                                <div style="font-weight: 600; color: #1e293b;"><?php echo htmlspecialchars($row['name']); ?></div>
+                                <div style="font-size: 0.75rem; color: #94a3b8;">ID: #<?php echo $row['id']; ?></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span style="font-size: 0.9rem;"><?php echo htmlspecialchars($row['category_name']); ?></span></td>
+                    <td><span style="font-weight: 600; color: #1e293b;">$<?php echo number_format($row['price'], 2); ?></span></td>
+                    <td><span class="badge badge-completed">In Stock</span></td>
+                    <td><span style="font-size: 0.85rem; color: #64748b;"><?php echo date('M d, Y', strtotime($row['created_at'])); ?></span></td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                            <a href="edit_product.php?id=<?php echo $row['id']; ?>" class="btn-action" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="manage_products.php?delete=<?php echo $row['id']; ?>" class="btn-action delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 <?php endwhile; ?>
-            </tbody>
-        </table>
-    </main>
-</body>
-</html>
+            <?php else: ?>
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 3rem; color: #94a3b8;">
+                        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+                        No products found matching your criteria.
+                    </td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+
+<?php require_once 'admin_footer.php'; ?>

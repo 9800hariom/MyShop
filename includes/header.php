@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,12 +14,13 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <header class="glass-header">
         <div class="logo">
             <a href="index.php">🛍️ MyShop</a>
         </div>
-        
+
         <div class="search-bar">
             <form action="index.php" method="GET">
                 <input type="text" name="search" placeholder="Search products...">
@@ -29,9 +31,10 @@ if (session_status() === PHP_SESSION_NONE) {
             <ul>
                 <li><a href="index.php">Home</a></li>
                 <?php if (isset($_SESSION['user_id'])): ?>
+                    <li><a href="products.php">Products</a></li>
                     <li><a href="cart.php">Cart 🛒</a></li>
                     <li><a href="user_orders.php">Orders</a></li>
-                    <?php if($_SESSION['role'] === 'admin'): ?>
+                    <?php if ($_SESSION['role'] === 'admin'): ?>
                         <li><a href="admin/dashboard.php">Admin Panel</a></li>
                     <?php endif; ?>
                     <li><a href="logout.php">Logout</a></li>

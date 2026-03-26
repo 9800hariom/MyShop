@@ -29,13 +29,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
         header("Location: login.php");
         exit;
     }
-    
+
     $user_id = $_SESSION['user_id'];
     $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
-    
+
     // Check if product already in cart
     $check = $conn->query("SELECT id, quantity FROM cart WHERE user_id = $user_id AND product_id = $product_id");
-    
+
     if ($check->num_rows > 0) {
         $cart_item = $check->fetch_assoc();
         $new_qty = $cart_item['quantity'] + $quantity;
@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
         $stmt2->bind_param("iii", $user_id, $product_id, $quantity);
         $stmt2->execute();
     }
-    
+
     $success_msg = "Product added to cart successfully.";
 }
 
@@ -68,30 +68,32 @@ if (!empty($imgName)) {
 ?>
 
 <div style="display: flex; gap: 3rem; margin-top: 2rem; background: var(--surface); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+    <button type="submit" name="add_to_cart" class="btn-fill" style="align-self: flex-end; padding: 0.8rem 2rem; font-size: 1.1rem; border-radius: 8px;"><a href="products.php" style="text-decoration:none;">Back To</a></button>
     <div style="flex: 1;">
         <img src="<?php echo $imagePath; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; border-radius: 8px; object-fit: cover; border: 1px solid var(--border);">
     </div>
-    
+
     <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
         <?php if (isset($success_msg)) echo "<div class='alert alert-success'>$success_msg <a href=\"cart.php\">View Cart</a></div>"; ?>
-        
+
         <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem;"><?php echo htmlspecialchars($product['name']); ?></h1>
         <p style="color: var(--text-secondary); margin-bottom: 1rem;">Category: <?php echo htmlspecialchars($product['category_name']); ?></p>
-        
+
         <p style="font-size: 2rem; color: var(--primary); font-weight: bold; margin-bottom: 1.5rem;">$<?php echo number_format($product['price'], 2); ?></p>
-        
+
         <div style="margin-bottom: 2rem;">
             <p style="line-height: 1.8; color: var(--text-primary);"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
         </div>
-        
+
         <form method="POST" action="" style="display: flex; gap: 1rem; align-items: stretch;">
             <div style="display: flex; flex-direction: column;">
                 <label for="quantity" style="margin-bottom: 0.3rem; font-size: 0.9rem; font-weight: 500;">Quantity</label>
                 <input type="number" id="quantity" name="quantity" value="1" min="1" style="width: 80px; padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; text-align: center;">
             </div>
-            
+
             <button type="submit" name="add_to_cart" class="btn-fill" style="align-self: flex-end; padding: 0.8rem 2rem; font-size: 1.1rem; border-radius: 8px;">Add to Cart 🛒</button>
         </form>
+
     </div>
 </div>
 

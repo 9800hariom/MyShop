@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/connection.php';
-require_once '../includes/auth.php';
+$page_title = 'Edit Product';
+require_once 'admin_header.php';
 require_once '../includes/functions.php';
 
 $categories = $conn->query("SELECT * FROM categories ORDER BY name ASC");
@@ -71,82 +71,92 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Product</title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-    <header class="glass-header">
-        <div class="logo">
-            <a href="dashboard.php">🛠️ Admin Panel</a>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="../index.php">Storefront</a></li>
-                <li><a href="manage_products.php" style="color: var(--primary);">Products</a></li>
-                <li><a href="add_product.php">Add Product</a></li>
-                <li><a href="manage_orders.php">Orders</a></li>
-                <li><a href="manage_users.php">Users</a></li>
-                <li><a href="../logout.php">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
+
+<div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+    <div>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">Edit Product Information</h2>
+        <p style="color: #64748b; font-size: 0.9rem;">Modify the product details for <strong><?php echo htmlspecialchars($product['name']); ?></strong>.</p>
+    </div>
+    <a href="manage_products.php" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+        <i class="fas fa-arrow-left"></i> Back to Products
+    </a>
+</div>
+
+<div class="chart-container" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+    <?php if (isset($error)): ?>
+        <div class="alert alert-error"><?php echo $error; ?></div>
+    <?php endif; ?>
+    <?php if (isset($success)): ?>
+        <div class="alert alert-success"><?php echo $success; ?></div>
+    <?php endif; ?>
     
-    <main>
-        <div class="form-container" style="max-width: 600px;">
-            <h2>Edit Product</h2>
-            <?php if (isset($error)) echo "<div class='alert alert-error'>$error</div>"; ?>
-            <?php if (isset($success)) echo "<div class='alert alert-success'>$success</div>"; ?>
+    <form method="POST" action="" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Product Name</label>
+                <input type="text" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required>
+            </div>
             
-            <form method="POST" action="" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>Product Name</label>
-                    <input type="text" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required>
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Current Image</label>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; display: inline-block;">
+                    <?php 
+                        $imgName = $product['image'];
+                        $imagePath = 'https://via.placeholder.com/150?text=No+Img';
+                        if (!empty($imgName)) {
+                            $possiblePaths = [
+                                $imgName,
+                                '../uploads/' . $imgName,
+                                '../images/' . $imgName,
+                                '../' . $imgName
+                            ];
+                            foreach ($possiblePaths as $path) {
+                                if (file_exists($path)) {
+                                    $imagePath = $path;
+                                    break;
+                                }
+                            }
+                        }
+                    ?>
+                    <img src="<?php echo $imagePath; ?>" alt="Current Product Image" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
                 </div>
-                
-                <div class="form-group">
-                    <label>Price ($)</label>
-                    <input type="number" step="0.01" name="price" value="<?php echo htmlspecialchars($product['price']); ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Category</label>
-                    <div style="display: flex; gap: 1rem;">
-                        <select name="category_id" required style="flex: 1;">
-                            <option value="">Select Category</option>
-                            <?php 
-                            // Reset categories pointer since we might loop multiple times if we had a bug, but here we only loop once
-                            mysqli_data_seek($categories, 0);
-                            while ($cat = $categories->fetch_assoc()): ?>
-                                <option value="<?php echo $cat['id']; ?>" <?php echo $product['category_id'] == $cat['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($cat['name']); ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Product Image (Leave blank to keep current)</label>
-                    <?php if ($product['image']): ?>
-                        <div style="margin-bottom: 0.5rem;">
-                            <img src="../uploads/<?php echo htmlspecialchars($product['image']); ?>" alt="Current Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px;" onerror="this.src='https://via.placeholder.com/100?text=No+Img';">
-                        </div>
-                    <?php endif; ?>
-                    <input type="file" name="image" accept="image/*" style="padding: 0.5rem; background: var(--background);">
-                </div>
-                
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" rows="5"><?php echo htmlspecialchars($product['description']); ?></textarea>
-                </div>
-                
-                <button type="submit" class="btn-submit">Update Product</button>
-            </form>
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Update Image (Optional)</label>
+                <input type="file" name="image" accept="image/*" style="padding: 0.5rem; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px;">
+                <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 5px;">Leave blank to keep the current image.</p>
+            </div>
+            
+            <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" step="0.01" name="price" value="<?php echo htmlspecialchars($product['price']); ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category_id" required>
+                    <option value="">Select Category</option>
+                    <?php 
+                    mysqli_data_seek($categories, 0);
+                    while ($cat = $categories->fetch_assoc()): ?>
+                        <option value="<?php echo $cat['id']; ?>" <?php echo $product['category_id'] == $cat['id'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($cat['name']); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Description</label>
+                <textarea name="description" rows="5"><?php echo htmlspecialchars($product['description']); ?></textarea>
+            </div>
         </div>
-    </main>
-</body>
-</html>
+        
+        <div style="margin-top: 1rem; text-align: right;">
+            <button type="submit" class="btn-fill" style="padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600;">Save Changes</button>
+        </div>
+    </form>
+</div>
+
+<?php require_once 'admin_footer.php'; ?>

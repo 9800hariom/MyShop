@@ -106,7 +106,7 @@ $total_price = 0;
 <?php else: ?>
     <div style="text-align: center; padding: 4rem;">
         <p style="font-size: 1.2rem; margin-bottom: 1rem;">Your cart is empty.</p>
-        <a href="index.php" class="btn-fill" style="text-decoration:none;">Continue Shopping</a>
+        <a href="products.php" class="btn-fill" style="text-decoration:none;">Continue Shopping</a>
     </div>
 <?php endif; ?>
 

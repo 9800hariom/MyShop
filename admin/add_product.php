@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/connection.php';
-require_once '../includes/auth.php';
+$page_title = 'Add New Product';
+require_once 'admin_header.php';
 require_once '../includes/functions.php';
 
 $categories = $conn->query("SELECT * FROM categories ORDER BY name ASC");
@@ -46,73 +46,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Add Product</title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-    <header class="glass-header">
-        <div class="logo">
-            <a href="dashboard.php">🛠️ Admin Panel</a>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="../index.php">Storefront</a></li>
-                <li><a href="manage_products.php">Products</a></li>
-                <li><a href="add_product.php" style="color: var(--primary);">Add Product</a></li>
-                <li><a href="manage_orders.php">Orders</a></li>
-                <li><a href="manage_users.php">Users</a></li>
-                <li><a href="../logout.php">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
+
+<div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+    <div>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">Create New Product</h2>
+        <p style="color: #64748b; font-size: 0.9rem;">Fill in the details below to add a new product to your catalog.</p>
+    </div>
+    <a href="manage_products.php" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+        <i class="fas fa-arrow-left"></i> Back to Products
+    </a>
+</div>
+
+<div class="chart-container" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+    <?php if (isset($error)): ?>
+        <div class="alert alert-error"><?php echo $error; ?></div>
+    <?php endif; ?>
+    <?php if (isset($success)): ?>
+        <div class="alert alert-success"><?php echo $success; ?></div>
+    <?php endif; ?>
     
-    <main>
-        <div class="form-container" style="max-width: 600px;">
-            <h2>Add New Product</h2>
-            <?php if (isset($error)) echo "<div class='alert alert-error'>$error</div>"; ?>
-            <?php if (isset($success)) echo "<div class='alert alert-success'>$success</div>"; ?>
+    <form method="POST" action="" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Product Name</label>
+                <input type="text" name="name" required placeholder="e.g. Modern Sofa">
+            </div>
             
-            <form method="POST" action="" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>Product Name</label>
-                    <input type="text" name="name" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Price ($)</label>
-                    <input type="number" step="0.01" name="price" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Category</label>
-                    <div style="display: flex; gap: 1rem;">
-                        <select name="category_id" required style="flex: 1;">
-                            <option value="">Select Category</option>
-                            <?php while ($cat = $categories->fetch_assoc()): ?>
-                                <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
-                            <?php endwhile; ?>
-                        </select>
-                        <!-- In a real scenario, you'd have a separate manage_categories.php to add categories -->
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Product Image</label>
-                    <input type="file" name="image" accept="image/*" required style="padding: 0.5rem; background: var(--background);">
-                </div>
-                
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" rows="5"></textarea>
-                </div>
-                
-                <button type="submit" class="btn-submit">Add Product</button>
-            </form>
+            <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" step="0.01" name="price" required placeholder="0.00">
+            </div>
+            
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category_id" required>
+                    <option value="">Select Category</option>
+                    <?php while ($cat = $categories->fetch_assoc()): ?>
+                        <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Product Image</label>
+                <input type="file" name="image" accept="image/*" required style="padding: 0.5rem; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px;">
+                <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 5px;">Supported formats: JPG, PNG, WEBP, GIF</p>
+            </div>
+            
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Description</label>
+                <textarea name="description" rows="5" placeholder="Describe your product..."></textarea>
+            </div>
         </div>
-    </main>
-</body>
-</html>
+        
+        <div style="margin-top: 1rem; text-align: right;">
+            <button type="submit" class="btn-fill" style="padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600;">Add Product</button>
+        </div>
+    </form>
+</div>
+
+<?php require_once 'admin_footer.php'; ?>

@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/connection.php';
-require_once '../includes/auth.php';
+$page_title = 'Dashboard';
+require_once 'admin_header.php';
 
 // Fetch statistics
 $total_users = $conn->query("SELECT COUNT(*) as count FROM users WHERE role = 'user'")->fetch_assoc()['count'];
@@ -8,55 +8,107 @@ $total_products = $conn->query("SELECT COUNT(*) as count FROM products")->fetch_
 $total_orders = $conn->query("SELECT COUNT(*) as count FROM orders")->fetch_assoc()['count'];
 $total_sales = $conn->query("SELECT IFNULL(SUM(total_price), 0) as total FROM orders WHERE status = 'completed'")->fetch_assoc()['total'];
 
+// Data for Chart (last 7 days sales)
+$sales_data = [];
+$labels = [];
+for ($i = 6; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i days"));
+    $labels[] = date('M d', strtotime("-$i days"));
+    $res = $conn->query("SELECT IFNULL(SUM(total_price), 0) as total FROM orders WHERE DATE(created_at) = '$date' AND status = 'completed'");
+    $sales_data[] = $res->fetch_assoc()['total'];
+}
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-    <header class="glass-header">
-        <div class="logo">
-            <a href="dashboard.php">🛠️ Admin Panel</a>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #e0f2fe; color: #0369a1;">
+            <i class="fas fa-users"></i>
         </div>
-        <nav>
-            <ul>
-                <li><a href="../index.php">Storefront</a></li>
-                <li><a href="manage_products.php">Products</a></li>
-                <li><a href="add_product.php">Add Product</a></li>
-                <li><a href="manage_orders.php">Orders</a></li>
-                <li><a href="manage_users.php">Users</a></li>
-                <li><a href="../logout.php">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
+        <div class="stat-content">
+            <h3>Total Customers</h3>
+            <div class="value"><?php echo number_format($total_users); ?></div>
+        </div>
+    </div>
     
-    <main>
-        <h2 class="page-title">Dashboard Statistics</h2>
-        
-        <div class="products-grid">
-            <div class="product-card" style="padding: 2rem; background: linear-gradient(135deg, var(--primary), #a855f7); color: white;">
-                <h3>Total Users</h3>
-                <p style="font-size: 2.5rem; font-weight: bold; margin-top: 1rem; color: white !important;"><?php echo $total_users; ?></p>
-            </div>
-            
-            <div class="product-card" style="padding: 2rem; background: linear-gradient(135deg, #10B981, #059669); color: white;">
-                <h3>Total Products</h3>
-                <p style="font-size: 2.5rem; font-weight: bold; margin-top: 1rem; color: white !important;"><?php echo $total_products; ?></p>
-            </div>
-            
-            <div class="product-card" style="padding: 2rem; background: linear-gradient(135deg, #F59E0B, #D97706); color: white;">
-                <h3>Total Orders</h3>
-                <p style="font-size: 2.5rem; font-weight: bold; margin-top: 1rem; color: white !important;"><?php echo $total_orders; ?></p>
-            </div>
-            
-            <div class="product-card" style="padding: 2rem; background: linear-gradient(135deg, #EF4444, #DC2626); color: white;">
-                <h3>Total Sales</h3>
-                <p style="font-size: 2.5rem; font-weight: bold; margin-top: 1rem; color: white !important;">$<?php echo number_format($total_sales, 2); ?></p>
-            </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #f0fdf4; color: #15803d;">
+            <i class="fas fa-box"></i>
         </div>
-    </main>
-</body>
-</html>
+        <div class="stat-content">
+            <h3>Total Products</h3>
+            <div class="value"><?php echo number_format($total_products); ?></div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #b45309;">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Total Orders</h3>
+            <div class="value"><?php echo number_format($total_orders); ?></div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fdf2f8; color: #be185d;">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Total Sales</h3>
+            <div class="value">$<?php echo number_format($total_sales, 2); ?></div>
+        </div>
+    </div>
+</div>
+
+<div class="chart-container">
+    <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 600;">Sales Revenue (Last 7 Days)</h3>
+    <canvas id="salesChart" height="100"></canvas>
+</div>
+
+<script>
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: <?php echo json_encode($labels); ?>,
+            datasets: [{
+                label: 'Revenue ($)',
+                data: <?php echo json_encode($sales_data); ?>,
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#6366f1',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
+
+<?php require_once 'admin_footer.php'; ?>
