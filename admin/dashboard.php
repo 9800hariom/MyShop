@@ -19,50 +19,56 @@ for ($i = 6; $i >= 0; $i--) {
 }
 ?>
 
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #e0f2fe; color: #0369a1;">
-            <i class="fas fa-users"></i>
-        </div>
-        <div class="stat-content">
-            <h3>Total Customers</h3>
-            <div class="value"><?php echo number_format($total_users); ?></div>
-        </div>
+<style>
+    body{
+        background-color: #0369a1;
+    }
+</style>
+
+<div class="stats-grid" >
+    <div class=" stat-card">
+    <div class="stat-icon" style="background: #e0f2fe; color: #0369a1;">
+        <i class="fas fa-users"></i>
     </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #f0fdf4; color: #15803d;">
-            <i class="fas fa-box"></i>
-        </div>
-        <div class="stat-content">
-            <h3>Total Products</h3>
-            <div class="value"><?php echo number_format($total_products); ?></div>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #fef3c7; color: #b45309;">
-            <i class="fas fa-shopping-cart"></i>
-        </div>
-        <div class="stat-content">
-            <h3>Total Orders</h3>
-            <div class="value"><?php echo number_format($total_orders); ?></div>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #fdf2f8; color: #be185d;">
-            <i class="fas fa-dollar-sign"></i>
-        </div>
-        <div class="stat-content">
-            <h3>Total Sales</h3>
-            <div class="value">$<?php echo number_format($total_sales, 2); ?></div>
-        </div>
+    <div class="stat-content">
+        <h3>Total Customers</h3>
+        <div class="value"><?php echo number_format($total_users); ?></div>
     </div>
 </div>
 
-<div class="chart-container">
-    <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 600;">Sales Revenue (Last 7 Days)</h3>
+<div class="stat-card">
+    <div class="stat-icon" style="background: #f0fdf4; color: #15803d;">
+        <i class="fas fa-box"></i>
+    </div>
+    <div class="stat-content">
+        <h3>Total Products</h3>
+        <div class="value"><?php echo number_format($total_products); ?></div>
+    </div>
+</div>
+
+<div class="stat-card">
+    <div class="stat-icon" style="background: #fef3c7; color: #b45309;">
+        <i class="fas fa-shopping-cart"></i>
+    </div>
+    <div class="stat-content">
+        <h3>Total Orders</h3>
+        <div class="value"><?php echo number_format($total_orders); ?></div>
+    </div>
+</div>
+
+<div class="stat-card">
+    <div class="stat-icon" style="background: #fdf2f8; color: #be185d;">
+        <i class="fas fa-dollar-sign"></i>
+    </div>
+    <div class="stat-content">
+        <h3>Total Sales</h3>
+        <div class="value">$<?php echo number_format($total_sales, 2); ?></div>
+    </div>
+</div>
+</div>
+
+<div class="chart-container" style="background-color:orange;>
+    <h3 style=" margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 600;">Sales Revenue (Last 7 Days)</h3>
     <canvas id="salesChart" height="100"></canvas>
 </div>
 

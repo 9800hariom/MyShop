@@ -45,7 +45,7 @@ $result = $conn->query($sql);
 
     .modern-banner:hover {
         transform: translateY(-5px);
-        background: linear-gradient(105deg, #90a0af, #9e96b9);
+        background: linear-gradient(105deg, #29b905, #04bd57),#c70c0c;
     }
 
     .banner-content {
@@ -79,7 +79,7 @@ $result = $conn->query($sql);
         font-size: 1.1rem;
         font-weight: 600;
         border-radius: 50px;
-        background: linear-gradient(135deg, #b0b323, #07cf17,#c80c0c);
+        background: linear-gradient(135deg, #0dd884, #07cf17,#c80c0c);
         color: #667eea;
         text-decoration: none;
         transition: all 0.3s ease;

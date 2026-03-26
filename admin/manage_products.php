@@ -40,10 +40,17 @@ $result = $conn->query($sql);
 $categories = $conn->query("SELECT * FROM categories");
 ?>
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<style>
+    body {
+        background-color: #0369a1;
+
+    }
+</style>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; ">
     <div>
         <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">Product Inventory</h2>
-        <p style="color: #64748b; font-size: 0.9rem;">Manage, add, and edit your store products.</p>
+        <p style="color: #d5dae0; font-size: 0.9rem;">Manage, add, and edit your store products.</p>
     </div>
     <a href="add_product.php" class="btn-fill" style="text-decoration:none; padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 8px;">
         <i class="fas fa-plus"></i> Add New Product
@@ -59,18 +66,18 @@ $categories = $conn->query("SELECT * FROM categories");
         <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
         <input type="text" name="search" placeholder="Search products..." value="<?php echo htmlspecialchars($search); ?>" style="padding-left: 2.5rem; width: 100%;">
     </div>
-    
+
     <select name="category">
         <option value="0">All Categories</option>
-        <?php while($cat = $categories->fetch_assoc()): ?>
+        <?php while ($cat = $categories->fetch_assoc()): ?>
             <option value="<?php echo $cat['id']; ?>" <?php echo $category_filter == $cat['id'] ? 'selected' : ''; ?>>
                 <?php echo htmlspecialchars($cat['name']); ?>
             </option>
         <?php endwhile; ?>
     </select>
-    
+
     <button type="submit" class="btn-fill" style="padding: 0.6rem 1.5rem; border-radius: 8px;">Filter</button>
-    <?php if($search || $category_filter): ?>
+    <?php if ($search || $category_filter): ?>
         <a href="manage_products.php" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">Clear</a>
     <?php endif; ?>
 </form>
@@ -88,8 +95,8 @@ $categories = $conn->query("SELECT * FROM categories");
             </tr>
         </thead>
         <tbody>
-            <?php if($result->num_rows > 0): ?>
-                <?php while ($row = $result->fetch_assoc()): 
+            <?php if ($result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()):
                     $imgName = $row['image'];
                     $imagePath = 'https://via.placeholder.com/50?text=Img';
                     if (!empty($imgName)) {
@@ -107,31 +114,31 @@ $categories = $conn->query("SELECT * FROM categories");
                         }
                     }
                 ?>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <img src="<?php echo $imagePath; ?>" alt="" style="width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            <div>
-                                <div style="font-weight: 600; color: #1e293b;"><?php echo htmlspecialchars($row['name']); ?></div>
-                                <div style="font-size: 0.75rem; color: #94a3b8;">ID: #<?php echo $row['id']; ?></div>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px; ">
+                                <img src="<?php echo $imagePath; ?>" alt="" style="width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                <div>
+                                    <div style="font-weight: 600; color: #1e293b;"><?php echo htmlspecialchars($row['name']); ?></div>
+                                    <div style="font-size: 0.75rem; color: #94a3b8;">ID: #<?php echo $row['id']; ?></div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td><span style="font-size: 0.9rem;"><?php echo htmlspecialchars($row['category_name']); ?></span></td>
-                    <td><span style="font-weight: 600; color: #1e293b;">$<?php echo number_format($row['price'], 2); ?></span></td>
-                    <td><span class="badge badge-completed">In Stock</span></td>
-                    <td><span style="font-size: 0.85rem; color: #64748b;"><?php echo date('M d, Y', strtotime($row['created_at'])); ?></span></td>
-                    <td>
-                        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-                            <a href="edit_product.php?id=<?php echo $row['id']; ?>" class="btn-action" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a href="manage_products.php?delete=<?php echo $row['id']; ?>" class="btn-action delete" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+                        </td>
+                        <td><span style="font-size: 0.9rem;"><?php echo htmlspecialchars($row['category_name']); ?></span></td>
+                        <td><span style="font-weight: 600; color: #1e293b;">$<?php echo number_format($row['price'], 2); ?></span></td>
+                        <td><span class="badge badge-completed">In Stock</span></td>
+                        <td><span style="font-size: 0.85rem; color: #64748b;"><?php echo date('M d, Y', strtotime($row['created_at'])); ?></span></td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                <a href="edit_product.php?id=<?php echo $row['id']; ?>" class="btn-action" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="manage_products.php?delete=<?php echo $row['id']; ?>" class="btn-action delete" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
                 <?php endwhile; ?>
             <?php else: ?>
                 <tr>

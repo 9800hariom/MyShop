@@ -54,6 +54,12 @@ $result = $conn->query($sql);
     <?php endif; ?>
 </form>
 
+<style>
+    body {
+        background-color: #0369a1;
+    }
+</style>
+
 <div style="overflow-x: auto;">
     <table class="premium-table">
         <thead>
@@ -134,7 +140,7 @@ $result = $conn->query($sql);
                                     <b>Customer:</b> <?php echo htmlspecialchars($row['user_name']); ?><br>
                                     <b>Email:</b> <?php echo htmlspecialchars($row['user_email']); ?><br>
                                     <b>Contact:</b> <?php echo htmlspecialchars($row['contact_number']); ?><br>
-                                    
+
                                     <b>Address:</b> <?php echo htmlspecialchars($row['address']); ?><br>
                                     <b>Order Date:</b> <?php echo date('M d, Y H:i', strtotime($row['created_at'])); ?><br>
                                 </div>

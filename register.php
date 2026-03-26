@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Insert new user
         $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $name, $email, $password);
-        
+
         if ($stmt->execute()) {
             header("Location: login.php?registered=1");
             exit;
@@ -33,25 +33,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 require_once 'includes/header.php';
 ?>
 
-<div class="form-container">
+<div class="form-container" style="background-color:#667eea;">
     <h2>Register</h2>
     <?php if (isset($error)) echo "<div class='alert alert-error'>$error</div>"; ?>
     <form method="POST" action="">
         <div class="form-group">
-            <label>Full Name</label>
+            <label style="color: black;">Full Name</label>
             <input type="text" name="name" required>
         </div>
         <div class="form-group">
-            <label>Email</label>
+            <label style="color: black;">Email</label>
             <input type="email" name="email" required>
         </div>
         <div class="form-group">
-            <label>Password</label>
+            <label style="color: black;">Password</label>
             <input type="password" name="password" required minlength="6">
         </div>
         <button type="submit" class="btn-submit">Register</button>
     </form>
-    <p style="margin-top: 1rem; text-align: center;">Already have an account? <a href="login.php">Login here</a></p>
+    <p style="margin-top: 1rem; text-align: center;">Already have an account? <a href="login.php" style="color: white;">Login here</a></p>
 </div>
 
 <?php require_once 'includes/footer.php'; ?>

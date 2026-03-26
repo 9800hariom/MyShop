@@ -13,6 +13,19 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Modern aesthetic CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .glass-header {
+            background-color: orange;
+        }
+
+        .glass-header:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+    </style>
 </head>
 
 <body>

@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo $_SESSION['role'];
             if ($_SESSION['role'] == 'admin') {
                 header("Location: admin/dashboard.php");
-            }else {
+            } else {
                 header("Location: index.php");
             }
             exit;
@@ -39,21 +39,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 require_once 'includes/header.php';
 ?>
 
-<div class="form-container">
-    <h2>Login</h2>
-    <?php if (isset($error)) echo "<div class='alert alert-error'>$error</div>"; ?>
+<div class="form-container"
+    style="max-width:380px; margin:60px auto; padding:2rem; 
+background: rgba(255,255,255,0.15); 
+backdrop-filter: blur(15px);
+border-radius:20px; 
+box-shadow:0 15px 40px rgba(0,0,0,0.2);
+border:1px solid rgba(255,255,255,0.2);
+background-color:#667eea;
+font-family:Arial, sans-serif;">
+
+    <h2 style="text-align:center; margin-bottom:1.5rem; color:#333; font-size:1.8rem;">
+        Welcome Back
+    </h2>
+
+    <?php if (isset($error))
+        echo "<div style='background:#ff4d4d; color:white; padding:10px; border-radius:8px; margin-bottom:1rem; text-align:center;'>$error</div>";
+    ?>
+
     <form method="POST" action="">
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" required>
+
+        <div style="margin-bottom:1rem;">
+            <label style="display:block; margin-bottom:5px; font-weight:600;">Email</label>
+            <input type="email" name="email" required
+                style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; outline:none; transition:0.3s;">
         </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" required>
+
+        <div style="margin-bottom:1.5rem;">
+            <label style="display:block; margin-bottom:5px; font-weight:600;">Password</label>
+            <input type="password" name="password" required
+                style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; outline:none;">
         </div>
-        <button type="submit" class="btn-submit">Login</button>
+
+        <button type="submit"
+            style="width:100%; padding:12px; border:none; border-radius:10px;
+        background:linear-gradient(135deg,#667eea,#764ba2);
+        color:white; font-size:1rem; cursor:pointer;
+        transition:0.3s;">
+            Login
+        </button>
+
     </form>
-    <p style="margin-top: 1rem; text-align: center;">Don't have an account? <a href="register.php">Register here</a></p>
+
+    <p style="margin-top:1rem; text-align:center; font-size:0.9rem;">
+        Don't have an account?
+        <a href="register.php" style="color:white; font-weight:600; text-decoration:none;">
+            Register here
+        </a>
+    </p>
+
 </div>
 
 <?php require_once 'includes/footer.php'; ?>
