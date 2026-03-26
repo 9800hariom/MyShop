@@ -111,13 +111,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
                         <option value="COD">Cash on Delivery (COD)</option>
                     </select>
                 </div>
-
+                
                 <button type="submit" name="place_order" class="btn-submit"
                     style="font-size: 1.1rem; padding: 1rem;">
                     Confirm & Place Order
                 </button>
+                
 
-            </form>
+             </form>
         </div>
     </div>
 
