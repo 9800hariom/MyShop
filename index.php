@@ -32,7 +32,7 @@ $result = $conn->query($sql);
     /* Banner Styles */
     .modern-banner {
         position: relative;
-        background: linear-gradient(110deg, rgba(102, 126, 234, 0.85), rgba(214, 206, 221, 0.85)),
+        background: linear-gradient(110deg, rgba(102, 126, 234, 0.85), rgba(225, 221, 228, 0.85)),
             url('images/home.jpg') no-repeat center center/cover;
         padding: 6rem 2rem;
         border-radius: 24px;
@@ -45,6 +45,7 @@ $result = $conn->query($sql);
 
     .modern-banner:hover {
         transform: translateY(-5px);
+        background: linear-gradient(105deg, #90a0af, #9e96b9);
     }
 
     .banner-content {
@@ -61,7 +62,7 @@ $result = $conn->query($sql);
         margin-bottom: 1rem;
         letter-spacing: -2px;
         text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        animation: fadeInUp 0.8s ease;
+        animation: fadeInUp 0.2s ease;
     }
 
     .banner-subtitle {
@@ -78,7 +79,7 @@ $result = $conn->query($sql);
         font-size: 1.1rem;
         font-weight: 600;
         border-radius: 50px;
-        background: linear-gradient(135deg, #fff, #f0f0f0);
+        background: linear-gradient(135deg, #b0b323, #07cf17,#c80c0c);
         color: #667eea;
         text-decoration: none;
         transition: all 0.3s ease;
@@ -89,7 +90,7 @@ $result = $conn->query($sql);
     .btn-shop:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        background: linear-gradient(135deg, #f8f9fa, #fff);
+        background: linear-gradient(135deg, #f8f9fa, #c70c0c);
     }
 
     /* Marquee Styles */
@@ -219,39 +220,63 @@ $result = $conn->query($sql);
     }
 
     .btn {
-        display: inline-block;
-        padding: 0.7rem 1.5rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0.85rem 1.8rem;
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: #fff;
         text-decoration: none;
-        border-radius: 25px;
-        font-weight: 500;
-        transition: all 0.3s ease;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        border: none;
+        cursor: pointer;
         position: relative;
         overflow: hidden;
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.25);
+        transform: translateY(0);
+
     }
 
+    /* Shine effect */
     .btn::before {
         content: '';
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
+        top: -50%;
+        left: -50%;
+        width: 40%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.25);
+        transform: rotate(25deg);
+        transition: all 2.6s ease;
+        opacity: 0;
     }
 
     .btn:hover::before {
-        width: 300px;
-        height: 300px;
+        left: 120%;
+        opacity: 4;
     }
 
+    /* Hover state */
     .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 15px 30px rgba(148, 153, 155, 0.4);
+    }
+
+    /* Active click effect */
+    .btn:active {
+        transform: translateY(-1px) scale(0.98);
+        box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Focus accessibility */
+    .btn:focus {
+        outline: none;
+        box-shadow: 2 0 0 4px rgba(118, 75, 162, 0.3);
     }
 
     /* No Results Message */
@@ -369,7 +394,7 @@ $result = $conn->query($sql);
         <div class="banner-content">
             <h1 class="banner-title">Design Your Dream Space</h1>
             <p class="banner-subtitle">Modern furniture & decor at unbeatable prices</p>
-            <a href="products.php" class="btn-shop">Shop Now →</a>
+            <a href="products.php" class="btn-shop">Visit Now →</a>
 
             <div class="marquee-wrapper">
                 <div class="modern-marquee">
