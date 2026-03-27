@@ -1,8 +1,12 @@
 <?php
 require_once 'includes/connection.php';
-require_once 'includes/header.php';
 require_once 'includes/functions.php';
 
+session_start();
+
+/* =========================
+   AUTH CHECK (MUST BE FIRST)
+========================= */
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -10,7 +14,9 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch Cart Items
+/* =========================
+   FETCH CART ITEMS
+========================= */
 $sql = "SELECT c.quantity, p.id as product_id, p.price 
         FROM cart c 
         JOIN products p ON c.product_id = p.id 
@@ -31,7 +37,9 @@ if ($result && $result->num_rows > 0) {
     exit;
 }
 
-// PLACE ORDER
+/* =========================
+   PLACE ORDER LOGIC
+========================= */
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
 
     $address = sanitize_input($_POST['address']);
@@ -44,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
         $error = "Only Cash on Delivery is allowed.";
     } else {
 
-        // INSERT ORDER (FIXED)
+        // INSERT ORDER
         $stmt = $conn->prepare("
             INSERT INTO orders (user_id, total_price, status, address, contact_number)
             VALUES (?, ?, 'pending', ?, ?)
@@ -63,17 +71,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
             ");
 
             foreach ($cart_items as $item) {
-                $pid = $item['product_id'];
-                $qty = $item['quantity'];
-                $price = $item['price'];
-
-                $stmt_items->bind_param("iiid", $order_id, $pid, $qty, $price);
+                $stmt_items->bind_param(
+                    "iiid",
+                    $order_id,
+                    $item['product_id'],
+                    $item['quantity'],
+                    $item['price']
+                );
                 $stmt_items->execute();
             }
 
             // CLEAR CART
             $conn->query("DELETE FROM cart WHERE user_id = $user_id");
 
+            // REDIRECT (SAFE NOW)
             header("Location: user_orders.php?success=1");
             exit;
         } else {
@@ -82,7 +93,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
     }
 }
 ?>
-<button type="button" class="btn-fill" style="align-self:flex-start; padding:0.8rem 2rem; font-size:1.1rem; border-radius:8px;" onclick="window.location.href='cart.php'"> Back To Cart </button>
+
+<!-- =========================
+     HEADER (AFTER LOGIC)
+========================= -->
+<?php require_once 'includes/header.php'; ?>
+
+<!-- BACK BUTTON -->
+<button type="button" class="btn-fill"
+    style="align-self:flex-start; padding:0.8rem 2rem; font-size:1.1rem; border-radius:8px;"
+    onclick="window.location.href='cart.php'">
+    Back To Cart
+</button>
 
 <div style="display: flex; gap: 2rem; max-width: 1000px; margin: 0 auto;">
 
@@ -92,18 +114,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
 
         <div class="form-container" style="max-width: 100%; margin: 0;">
 
-            <?php if (isset($error)) echo "<div class='alert alert-error'>$error</div>"; ?>
+            <?php if (isset($error)) : ?>
+                <div class='alert alert-error'><?php echo $error; ?></div>
+            <?php endif; ?>
 
             <form method="POST">
 
                 <div class="form-group">
                     <label>Shipping Address</label>
-                    <textarea name="address" required rows="4" placeholder="Enter your full shipping address"></textarea>
+                    <textarea name="address" required rows="4"
+                        placeholder="Enter your full shipping address"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label>Contact Number</label>
-                    <input type="text" name="contact_number" required placeholder="Enter your phone number">
+                    <input type="text" name="contact_number" required
+                        placeholder="Enter your phone number">
                 </div>
 
                 <div class="form-group">
@@ -118,13 +144,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
                     Confirm & Place Order
                 </button>
 
-
             </form>
 
         </div>
-
     </div>
-
 
     <!-- RIGHT SIDE SUMMARY -->
     <div style="flex: 1;">
