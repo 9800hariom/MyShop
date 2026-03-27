@@ -31,15 +31,15 @@ $result = $conn->query($sql);
 $categories = $conn->query("SELECT * FROM categories ORDER BY name ASC");
 ?>
 
-<div style="display: flex; gap: 2rem; margin-top: 2rem;">
+<div style="display: flex; gap: 2rem; margin-top: 2rem; ">
     <!-- Filters Sidebar -->
-    <aside style="width: 250px; flex-shrink: 0; background: var(--surface); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+    <aside style="width: 250px; flex-shrink: 0; background: var(--surface); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);background-color:orange;">
         <h3>Filters</h3>
         <form action="" method="GET" style="margin-top: 1rem;">
             <?php if ($search): ?>
                 <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
             <?php endif; ?>
-            
+
             <div class="form-group">
                 <label>Category</label>
                 <select name="category" onchange="this.form.submit()">
@@ -65,13 +65,13 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY name ASC");
     <!-- Products List -->
     <div style="flex: 1;">
         <h2 class="page-title">Products</h2>
-        
+
         <div class="products-grid">
             <?php
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo '<div class="product-card">';
-                    
+
                     $imgName = htmlspecialchars($row['image']);
                     if (!empty($imgName)) {
                         if (file_exists($imgName)) {
@@ -88,7 +88,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY name ASC");
                     } else {
                         $imagePath = 'https://via.placeholder.com/250x200?text=No+Image';
                     }
-                    
+
                     echo '<img src="' . $imagePath . '" alt="' . htmlspecialchars($row['name']) . '">';
                     echo '<div class="product-info">';
                     echo '<h3>' . htmlspecialchars($row['name']) . '</h3>';

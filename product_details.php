@@ -66,9 +66,10 @@ if (!empty($imgName)) {
     $imagePath = 'https://via.placeholder.com/500x400?text=No+Image';
 }
 ?>
+<button type="button" class="btn-fill" style="align-self:flex-end; padding:0.8rem 2rem; font-size:1.1rem; border-radius:8px;" onclick="window.location.href='products.php'"> Back To Products </button>
 
 <div style="display: flex; gap: 3rem; margin-top: 2rem; background: var(--surface); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-    <button type="button" class="btn-fill" style="align-self:flex-end; padding:0.8rem 2rem; font-size:1.1rem; border-radius:8px;" onclick="window.location.href='products.php'"> Back To Products </button>
+    <!-- <button type="button" class="btn-fill" style="align-self:flex-end; padding:0.8rem 2rem; font-size:1.1rem; border-radius:8px;" onclick="window.location.href='products.php'"> Back To Products </button> -->
     <div style="flex: 1;">
         <img src="<?php echo $imagePath; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; border-radius: 8px; object-fit: cover; border: 1px solid var(--border);">
     </div>

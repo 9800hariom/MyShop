@@ -7,6 +7,8 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+
+
 $user_id = $_SESSION['user_id'];
 
 // Handle Remove Item
@@ -18,20 +20,39 @@ if (isset($_GET['remove'])) {
 }
 
 // Handle Update Quantity
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_cart'])) {
-    foreach ($_POST['quantity'] as $cart_id => $qty) {
-        $cart_id = intval($cart_id);
-        $qty = intval($qty);
-        if ($qty > 0) {
-            $conn->query("UPDATE cart SET quantity = $qty WHERE id = $cart_id AND user_id = $user_id");
-        } else {
-            $conn->query("DELETE FROM cart WHERE id = $cart_id AND user_id = $user_id");
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    if (!empty($_POST['quantity'])) {
+
+        foreach ($_POST['quantity'] as $cart_id => $qty) {
+
+            $cart_id = (int)$cart_id;
+            $qty = (int)$qty;
+
+            // 🔥 DEBUG (remove later)
+            // echo "Cart ID: $cart_id | Qty: $qty | User: $user_id";
+
+            if ($qty > 0) {
+
+                $sql = "UPDATE cart 
+                        SET quantity = $qty 
+                        WHERE id = $cart_id";
+            } else {
+
+                $sql = "DELETE FROM cart WHERE id = $cart_id";
+            }
+
+            $conn->query($sql);
+
+            if ($conn->error) {
+                die($conn->error);
+            }
         }
     }
+
     header("Location: cart.php");
     exit;
 }
-
 // Fetch Cart Items
 $sql = "SELECT c.id as cart_id, c.quantity, p.id as product_id, p.name, p.price, p.image 
         FROM cart c 
@@ -58,7 +79,7 @@ $total_price = 0;
                 </tr>
             </thead>
             <tbody>
-                <?php while ($item = $result->fetch_assoc()): 
+                <?php while ($item = $result->fetch_assoc()):
                     $subtotal = $item['price'] * $item['quantity'];
                     $total_price += $subtotal;
                     $imgName = htmlspecialchars($item['image']);
@@ -78,25 +99,25 @@ $total_price = 0;
                         $imagePath = 'https://via.placeholder.com/60?text=Img';
                     }
                 ?>
-                <tr>
-                    <td><img src="<?php echo $imagePath; ?>" alt="Product"></td>
-                    <td><a href="product_details.php?id=<?php echo $item['product_id']; ?>"><?php echo htmlspecialchars($item['name']); ?></a></td>
-                    <td>$<?php echo number_format($item['price'], 2); ?></td>
-                    <td>
-                        <input type="number" name="quantity[<?php echo $item['cart_id']; ?>]" value="<?php echo $item['quantity']; ?>" min="1" style="width: 60px; padding: 0.3rem;">
-                    </td>
-                    <td>$<?php echo number_format($subtotal, 2); ?></td>
-                    <td>
-                        <a href="cart.php?remove=<?php echo $item['cart_id']; ?>" style="color: var(--danger); text-decoration:none;">Remove</a>
-                    </td>
-                </tr>
+                    <tr>
+                        <td><img src="<?php echo $imagePath; ?>" alt="Product"></td>
+                        <td><a href="product_details.php?id=<?php echo $item['product_id']; ?>"><?php echo htmlspecialchars($item['name']); ?></a></td>
+                        <td>$<?php echo number_format($item['price'], 2); ?></td>
+                        <td>
+                            <input type="number" name="quantity[<?php echo $item['cart_id']; ?>]" value="<?php echo $item['quantity']; ?>" min="1" style="width: 60px; padding: 0.3rem;">
+                        </td>
+                        <td>$<?php echo number_format($subtotal, 2); ?></td>
+                        <td>
+                            <a href="cart.php?remove=<?php echo $item['cart_id']; ?>" style="color: var(--danger); text-decoration:none;">Remove</a>
+                        </td>
+                    </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
-        
+
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <button type="submit" name="update_cart" class="btn-outline">Update Cart</button>
-            
+            <!-- <button type="submit" class="btn-outline">Update Cart</button> -->
+
             <div class="cart-summary">
                 <h3>Total: $<?php echo number_format($total_price, 2); ?></h3>
                 <a href="checkout.php" class="btn-fill" style="display:inline-block; text-decoration:none; margin-top: 1rem;">Proceed to Checkout</a>
@@ -106,7 +127,7 @@ $total_price = 0;
 <?php else: ?>
     <div style="text-align: center; padding: 4rem;">
         <p style="font-size: 1.2rem; margin-bottom: 1rem;">Your cart is empty.</p>
-        <a href="products.php" class="btn-fill" style="text-decoration:none;">Continue Shopping</a>
+        <a href="index.php" class="btn-fill" style="text-decoration:none;">Continue Shopping</a>
     </div>
 <?php endif; ?>
 

@@ -82,6 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
     }
 }
 ?>
+<button type="button" class="btn-fill" style="align-self:flex-start; padding:0.8rem 2rem; font-size:1.1rem; border-radius:8px;" onclick="window.location.href='cart.php'"> Back To Cart </button>
 
 <div style="display: flex; gap: 2rem; max-width: 1000px; margin: 0 auto;">
 
@@ -111,16 +112,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
                         <option value="COD">Cash on Delivery (COD)</option>
                     </select>
                 </div>
-                
+
                 <button type="submit" name="place_order" class="btn-submit"
                     style="font-size: 1.1rem; padding: 1rem;">
                     Confirm & Place Order
                 </button>
-                
 
-             </form>
+
+            </form>
+
         </div>
+
     </div>
+
 
     <!-- RIGHT SIDE SUMMARY -->
     <div style="flex: 1;">
