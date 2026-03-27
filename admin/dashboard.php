@@ -20,56 +20,60 @@ for ($i = 6; $i >= 0; $i--) {
 ?>
 
 <style>
-    body{
+    body {
         background-color: #0369a1;
+    }
+
+    .chart-container {
+        background: linear-gradient(135deg, #cfd146, #dfd665, #c8d145);
     }
 </style>
 
-<div class="stats-grid" >
+<div class="stats-grid">
     <div class=" stat-card">
-    <div class="stat-icon" style="background: #e0f2fe; color: #0369a1;">
-        <i class="fas fa-users"></i>
+        <div class="stat-icon" style="background: #e0f2fe; color: #0369a1;">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Total Customers</h3>
+            <div class="value"><?php echo number_format($total_users); ?></div>
+        </div>
     </div>
-    <div class="stat-content">
-        <h3>Total Customers</h3>
-        <div class="value"><?php echo number_format($total_users); ?></div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #f0fdf4; color: #15803d;">
+            <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Total Products</h3>
+            <div class="value"><?php echo number_format($total_products); ?></div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #b45309;">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Total Orders</h3>
+            <div class="value"><?php echo number_format($total_orders); ?></div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fdf2f8; color: #be185d;">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Total Sales</h3>
+            <div class="value">$<?php echo number_format($total_sales, 2); ?></div>
+        </div>
     </div>
 </div>
 
-<div class="stat-card">
-    <div class="stat-icon" style="background: #f0fdf4; color: #15803d;">
-        <i class="fas fa-box"></i>
-    </div>
-    <div class="stat-content">
-        <h3>Total Products</h3>
-        <div class="value"><?php echo number_format($total_products); ?></div>
-    </div>
-</div>
-
-<div class="stat-card">
-    <div class="stat-icon" style="background: #fef3c7; color: #b45309;">
-        <i class="fas fa-shopping-cart"></i>
-    </div>
-    <div class="stat-content">
-        <h3>Total Orders</h3>
-        <div class="value"><?php echo number_format($total_orders); ?></div>
-    </div>
-</div>
-
-<div class="stat-card">
-    <div class="stat-icon" style="background: #fdf2f8; color: #be185d;">
-        <i class="fas fa-dollar-sign"></i>
-    </div>
-    <div class="stat-content">
-        <h3>Total Sales</h3>
-        <div class="value">$<?php echo number_format($total_sales, 2); ?></div>
-    </div>
-</div>
-</div>
-
-<div class="chart-container" style="background-color:orange;>
-    <h3 style=" margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 600;">Sales Revenue (Last 7 Days)</h3>
-    <canvas id="salesChart" height="100"></canvas>
+<div class="chart-container">
+    <h3> Sales Revenue (Last 7 Days)</h3>
+    <canvas id="salesChart"></canvas>
 </div>
 
 <script>
@@ -82,7 +86,7 @@ for ($i = 6; $i >= 0; $i--) {
                 label: 'Revenue ($)',
                 data: <?php echo json_encode($sales_data); ?>,
                 borderColor: '#6366f1',
-                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                backgroundColor: 'rgba(10, 10, 14, 0.1)',
                 borderWidth: 3,
                 tension: 0.4,
                 fill: true,
@@ -90,6 +94,7 @@ for ($i = 6; $i >= 0; $i--) {
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
                 pointRadius: 5
+
             }]
         },
         options: {

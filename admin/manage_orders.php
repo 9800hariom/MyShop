@@ -33,7 +33,7 @@ $result = $conn->query($sql);
 
 <div style="margin-bottom: 2rem;">
     <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">Order Management</h2>
-    <p style="color: #64748b; font-size: 0.9rem;">Track and manage customer orders and fulfillment.</p>
+    <p style="color: #d9dce0; font-size: 0.9rem;">Track and manage customer orders and fulfillment.</p>
 </div>
 
 <?php if (isset($_GET['success'])): ?>
