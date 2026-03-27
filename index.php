@@ -32,20 +32,55 @@ $result = $conn->query($sql);
     /* Banner Styles */
     .modern-banner {
         position: relative;
-        background: linear-gradient(110deg, rgba(102, 126, 234, 0.85), rgba(225, 221, 228, 0.85)),
-            url('images/home.jpg') no-repeat center center/cover;
+        background: url('images/home.jpg') no-repeat center center/cover;
         padding: 6rem 2rem;
         border-radius: 24px;
         margin-bottom: 3rem;
         overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
         width: 100%;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
     }
 
+    /* smooth hover effect */
     .modern-banner:hover {
-        transform: translateY(-5px);
-        background: linear-gradient(105deg, #29b905, #04bd57),#c70c0c;
+        transform: translateY(-6px);
+    }
+
+    /* DARK OVERLAY for readability */
+    .modern-banner::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg,
+                rgba(0, 0, 0, 0.55),
+                rgba(0, 0, 0, 0.2));
+        z-index: 1;
+    }
+
+    /* content should be above overlay */
+    .modern-banner>* {
+        position: relative;
+        z-index: 2;
+    }
+
+    .modern-banner::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.15), transparent 60%);
+        z-index: 1;
+        animation: glowMove 6s infinite alternate;
+    }
+
+    @keyframes glowMove {
+        0% {
+            transform: scale(1);
+        }
+
+        100% {
+            transform: scale(1.1);
+        }
     }
 
     .banner-content {
@@ -60,9 +95,16 @@ $result = $conn->query($sql);
         font-size: 4rem;
         font-weight: 800;
         margin-bottom: 1rem;
-        letter-spacing: -2px;
-        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        animation: fadeInUp 0.2s ease;
+        letter-spacing: -1px;
+
+        /* Premium gradient text */
+        background: linear-gradient(135deg, #ffffff, #ffd89b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+
+        text-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+
+        animation: fadeInUp 0.8s ease forwards;
     }
 
     .banner-subtitle {
@@ -79,18 +121,37 @@ $result = $conn->query($sql);
         font-size: 1.1rem;
         font-weight: 600;
         border-radius: 50px;
-        background: linear-gradient(135deg, #0dd884, #07cf17,#c80c0c);
-        color: #667eea;
+
+        /* Premium gradient */
+        background: linear-gradient(135deg, #ff6a00, #ee0979);
+
+        color: #fff;
         text-decoration: none;
+
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 25px rgba(255, 106, 0, 0.3);
+
         animation: fadeInUp 0.8s ease 0.4s both;
+        position: relative;
+        overflow: hidden;
     }
 
-    .btn-shop:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        background: linear-gradient(135deg, #f8f9fa, #c70c0c);
+    .btn-shop::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent);
+        transition: 0.5s;
+    }
+
+    .btn-shop:hover::before {
+        left: 100%;
     }
 
     /* Marquee Styles */
