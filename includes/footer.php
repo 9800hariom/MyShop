@@ -1,11 +1,20 @@
     </main>
+    <style>
+        footer {
+            background-color: orange;
+
+        }
+    </style>
     <footer>
+        <marquee behavior="scroll" direction="right" scrollamount="5">
+            <h1> 🚀 Fast Delivery Across Nepal | 💳 Secure Payments | 🔥 Best Deals Every Day | 🛒 New Products Added Weekly | 📦 Easy Return Policy</h1>
+        </marquee>
         <div class="footer-content"
             style="text-align:center; display:flex; flex-direction:column; align-items:center; padding:2.5rem; 
-background: linear-gradient(135deg, #1e3c72, #2a5298); 
+background: linear-gradient(135deg, rgb(233, 108, 5), #e4bb06); 
 border-top-left-radius:25px; border-top-right-radius:25px; 
 box-shadow:0 -10px 25px rgba(0,0,0,0.25); 
-position:relative; overflow:hidden;">
+ overflow:hidden;bottom:0%;">
 
             <!-- glow top line -->
             <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:80%;height:2px;background:linear-gradient(90deg,transparent,white,transparent);opacity:0.4;"></div>
@@ -21,7 +30,7 @@ position:relative; overflow:hidden;">
         border-radius:12px;
         backdrop-filter:blur(10px);
         box-shadow:0 8px 20px rgba(0,0,0,0.15);
-        transition:0.3s ease;">
+        transition:0.3s ease; ">
 
                 <img src="images/bank-card.png"
                     style="height:28px; object-fit:contain; filter:brightness(1.1);" />
@@ -29,8 +38,14 @@ position:relative; overflow:hidden;">
                 <img src="images/bank-card2.png"
                     style="height:28px; object-fit:contain; filter:brightness(1.1);" />
             </div>
+            <marquee behavior="scroll" direction="left" scrollamount="5">
+                <h1> 🖤 Elevate Your Lifestyle | ✨ Exclusive Collections | 👑 Luxury Meets Affordability | 🚀 Worldwide Shipping | 💼 Designed for Modern Shopping Experience</h1>
+            </marquee>
 
         </div>
+        <marquee behavior="move" direction="up" scrollamount="6">
+            <h1> ✨ Shop Smart, Live Better | 💥 Huge Discounts on Electronics & Fashion | 🚚 Free Shipping on Orders Above $50 | 🔒 100% Secure Checkout | 🛍️ New Arrivals Daily</h1>
+        </marquee>
     </footer>
     <script src="js/script.js"></script>
     </body>
