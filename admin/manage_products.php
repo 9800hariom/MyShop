@@ -125,7 +125,7 @@ $categories = $conn->query("SELECT * FROM categories");
                             </div>
                         </td>
                         <td><span style="font-size: 0.9rem;"><?php echo htmlspecialchars($row['category_name']); ?></span></td>
-                        <td><span style="font-weight: 600; color: #1e293b;">$<?php echo number_format($row['price'], 2); ?></span></td>
+                        <td><span style="font-weight: 600; color: #1e293b;">रु <?php echo number_format($row['price'], 0); ?></span></td>
                         <td><span class="badge badge-completed">In Stock</span></td>
                         <td><span style="font-size: 0.85rem; color: #64748b;"><?php echo date('M d, Y', strtotime($row['created_at'])); ?></span></td>
                         <td>

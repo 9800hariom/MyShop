@@ -62,11 +62,11 @@ for ($i = 6; $i >= 0; $i--) {
 
     <div class="stat-card">
         <div class="stat-icon" style="background: #fdf2f8; color: #be185d;">
-            <i class="fas fa-dollar-sign"></i>
+            <i class="fas fa-rupee-sign"></i> रु
         </div>
         <div class="stat-content">
             <h3>Total Sales</h3>
-            <div class="value">$<?php echo number_format($total_sales, 2); ?></div>
+            <div class="value">रु <?php echo number_format($total_sales, 0); ?></div>
         </div>
     </div>
 </div>
@@ -83,7 +83,7 @@ for ($i = 6; $i >= 0; $i--) {
         data: {
             labels: <?php echo json_encode($labels); ?>,
             datasets: [{
-                label: 'Revenue ($)',
+                label: 'Revenue (रु)',
                 data: <?php echo json_encode($sales_data); ?>,
                 borderColor: '#6366f1',
                 backgroundColor: 'rgba(10, 10, 14, 0.1)',

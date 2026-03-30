@@ -8,14 +8,20 @@ if (isset($_SESSION['role'])) {
     }
 }
 
-// Fetch Featured Products (last 8)
+// Fetch Featured Products (last 8) with avg rating
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
-$sql = "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id";
+$sql = "SELECT p.*, c.name as category_name,
+        COALESCE(AVG(r.rating),0) as avg_rating,
+        COUNT(r.id) as rating_count
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        LEFT JOIN product_ratings r ON p.id = r.product_id";
 
 if ($search) {
     $sql .= " WHERE p.name LIKE '%$search%'";
+    $sql .= " GROUP BY p.id";
 } else {
-    $sql .= " ORDER BY p.created_at DESC LIMIT 8";
+    $sql .= " GROUP BY p.id ORDER BY p.created_at DESC LIMIT 8";
 }
 
 $result = $conn->query($sql);
@@ -277,8 +283,34 @@ $result = $conn->query($sql);
         font-size: 1.3rem;
         font-weight: 700;
         color: #764ba2;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
+
+    /* Stock badge */
+    .stock-badge {
+        display: inline-block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+        margin-bottom: 0.7rem;
+    }
+    .stock-badge.in-stock  { background:#d1fae5; color:#065f46; }
+    .stock-badge.low-stock { background:#fef3c7; color:#92400e; }
+    .stock-badge.out-stock { background:#fee2e2; color:#991b1b; }
+
+    /* Star rating */
+    .star-rating {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2px;
+        margin-bottom: 0.6rem;
+        font-size: 1rem;
+    }
+    .star-rating .star       { color: #d1d5db; }
+    .star-rating .star.filled{ color: #f59e0b; }
+    .star-rating .rating-count{ font-size:0.78rem; color:#718096; margin-left:4px; }
 
     .btn {
         display: inline-flex;
@@ -500,7 +532,25 @@ $result = $conn->query($sql);
             echo '<img src="' . $imagePath . '" alt="' . htmlspecialchars($row['name']) . '">';
             echo '<div class="product-info">';
             echo '<h3>' . htmlspecialchars($row['name']) . '</h3>';
-            echo '<p class="price">$' . number_format($row['price'], 2) . '</p>';
+            // Star rating
+            $avg   = round((float)$row['avg_rating']);
+            $count = (int)$row['rating_count'];
+            $stars = '';
+            for ($s = 1; $s <= 5; $s++) {
+                $stars .= '<span class="star' . ($s <= $avg ? ' filled' : '') . '">★</span>';
+            }
+            echo '<div class="star-rating">' . $stars . '<span class="rating-count">(' . $count . ')</span></div>';
+            // Price
+            echo '<p class="price">रु ' . number_format($row['price']) . '</p>';
+            // Stock badge
+            $qty = (int)$row['stock_quantity'];
+            if ($qty <= 0) {
+                echo '<span class="stock-badge out-stock">Out of Stock</span>';
+            } elseif ($qty <= 10) {
+                echo '<span class="stock-badge low-stock">Only ' . $qty . ' left!</span>';
+            } else {
+                echo '<span class="stock-badge in-stock">In Stock (' . $qty . ')</span>';
+            }
             echo '<a href="product_details.php?id=' . $row['id'] . '" class="btn">View Details →</a>';
             echo '</div>';
             echo '</div>';

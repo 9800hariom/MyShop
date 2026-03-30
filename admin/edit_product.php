@@ -25,6 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $price = sanitize_input($_POST['price']);
     $description = sanitize_input($_POST['description']);
     $category_id = intval($_POST['category_id']);
+    $stock_quantity = intval($_POST['stock_quantity']);
     
     // Handle Image Upload
     $image = $product['image']; // Keep old image by default
@@ -54,8 +55,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     if (!isset($error)) {
-        $stmt = $conn->prepare("UPDATE products SET name=?, price=?, image=?, description=?, category_id=? WHERE id=?");
-        $stmt->bind_param("sdssii", $name, $price, $image, $description, $category_id, $id);
+        $stmt = $conn->prepare("UPDATE products SET name=?, price=?, image=?, description=?, category_id=?, stock_quantity=? WHERE id=?");
+        $stmt->bind_param("sdssiii", $name, $price, $image, $description, $category_id, $stock_quantity, $id);
         
         if ($stmt->execute()) {
             $success = "Product updated successfully.";
@@ -65,6 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $product['description'] = $description;
             $product['category_id'] = $category_id;
             $product['image'] = $image;
+            $product['stock_quantity'] = $stock_quantity;
         } else {
             $error = "Failed to update product: " . $stmt->error;
         }
@@ -131,6 +133,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-group">
                 <label>Price ($)</label>
                 <input type="number" step="0.01" name="price" value="<?php echo htmlspecialchars($product['price']); ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Stock Quantity</label>
+                <input type="number" name="stock_quantity" required min="0"
+                    value="<?php echo isset($product['stock_quantity']) ? (int)$product['stock_quantity'] : 100; ?>">
             </div>
             
             <div class="form-group">

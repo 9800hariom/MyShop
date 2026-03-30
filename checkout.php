@@ -17,7 +17,7 @@ $user_id = $_SESSION['user_id'];
 /* =========================
    FETCH CART ITEMS
 ========================= */
-$sql = "SELECT c.quantity, p.id as product_id, p.price 
+$sql = "SELECT c.quantity, p.id as product_id, p.name as product_name, p.price, p.stock_quantity
         FROM cart c 
         JOIN products p ON c.product_id = p.id 
         WHERE c.user_id = $user_id";
@@ -52,43 +52,68 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
         $error = "Only Cash on Delivery is allowed.";
     } else {
 
-        // INSERT ORDER
-        $stmt = $conn->prepare("
-            INSERT INTO orders (user_id, total_price, status, address, contact_number)
-            VALUES (?, ?, 'pending', ?, ?)
-        ");
+        // =============================
+        // STOCK VALIDATION BEFORE ORDER
+        // =============================
+        $stock_error = null;
+        foreach ($cart_items as $item) {
+            if ($item['quantity'] > $item['stock_quantity']) {
+                $available = (int)$item['stock_quantity'];
+                $stock_error = "Sorry, only <strong>$available</strong> unit(s) of <strong>" . htmlspecialchars($item['product_name']) . "</strong> are available.";
+                break;
+            }
+        }
 
-        $stmt->bind_param("idss", $user_id, $total_price, $address, $contact_number);
-
-        if ($stmt->execute()) {
-
-            $order_id = $stmt->insert_id;
-
-            // INSERT ORDER ITEMS
-            $stmt_items = $conn->prepare("
-                INSERT INTO order_items (order_id, product_id, quantity, price)
-                VALUES (?, ?, ?, ?)
+        if ($stock_error) {
+            $error = $stock_error;
+        } else {
+            // INSERT ORDER
+            $stmt = $conn->prepare("
+                INSERT INTO orders (user_id, total_price, status, address, contact_number)
+                VALUES (?, ?, 'pending', ?, ?)
             ");
 
-            foreach ($cart_items as $item) {
-                $stmt_items->bind_param(
-                    "iiid",
-                    $order_id,
-                    $item['product_id'],
-                    $item['quantity'],
-                    $item['price']
-                );
-                $stmt_items->execute();
+            $stmt->bind_param("idss", $user_id, $total_price, $address, $contact_number);
+
+            if ($stmt->execute()) {
+
+                $order_id = $stmt->insert_id;
+
+                // INSERT ORDER ITEMS & DEDUCT STOCK
+                $stmt_items = $conn->prepare("
+                    INSERT INTO order_items (order_id, product_id, quantity, price)
+                    VALUES (?, ?, ?, ?)
+                ");
+
+                $stmt_stock = $conn->prepare("
+                    UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?
+                ");
+
+                foreach ($cart_items as $item) {
+                    // Insert order item
+                    $stmt_items->bind_param(
+                        "iiid",
+                        $order_id,
+                        $item['product_id'],
+                        $item['quantity'],
+                        $item['price']
+                    );
+                    $stmt_items->execute();
+
+                    // Deduct stock
+                    $stmt_stock->bind_param("ii", $item['quantity'], $item['product_id']);
+                    $stmt_stock->execute();
+                }
+
+                // CLEAR CART
+                $conn->query("DELETE FROM cart WHERE user_id = $user_id");
+
+                // REDIRECT (SAFE NOW)
+                header("Location: user_orders.php?success=1");
+                exit;
+            } else {
+                $error = "Failed to place order.";
             }
-
-            // CLEAR CART
-            $conn->query("DELETE FROM cart WHERE user_id = $user_id");
-
-            // REDIRECT (SAFE NOW)
-            header("Location: user_orders.php?success=1");
-            exit;
-        } else {
-            $error = "Failed to place order.";
         }
     }
 }
@@ -141,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
 
                 <button type="submit" name="place_order" class="btn-submit"
                     style="font-size: 1.1rem; padding: 1rem;">
-                    Confirm & Place Order
+                    Confirm &amp; Place Order
                 </button>
 
             </form>
@@ -157,14 +182,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
                 Order Summary
             </h3>
 
-            <div style="display:flex;justify-content:space-between;margin-bottom:1rem;">
+            <?php foreach ($cart_items as $item): ?>
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.6rem;font-size:0.9rem;color:#555;">
+                    <span><?php echo htmlspecialchars($item['product_name']); ?> × <?php echo $item['quantity']; ?></span>
+                    <span>रु <?php echo number_format($item['price'] * $item['quantity'], 0); ?></span>
+                </div>
+                <!-- Stock warning -->
+                <?php if ($item['quantity'] > $item['stock_quantity']): ?>
+                    <div style="color:#e53e3e;font-size:0.8rem;margin-bottom:0.5rem;">
+                        ⚠️ Only <?php echo (int)$item['stock_quantity']; ?> in stock!
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+            <div style="display:flex;justify-content:space-between;margin-bottom:1rem;border-top:1px solid var(--border);padding-top:0.8rem;">
                 <span>Total Items:</span>
                 <span><?php echo count($cart_items); ?></span>
             </div>
 
             <div style="display:flex;justify-content:space-between;margin-bottom:1rem;font-size:1.3rem;color:var(--primary);">
                 <span>Total:</span>
-                <span>$<?php echo number_format($total_price, 2); ?></span>
+                <span>रु <?php echo number_format($total_price, 0); ?></span>
             </div>
 
         </div>

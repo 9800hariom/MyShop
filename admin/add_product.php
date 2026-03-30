@@ -10,19 +10,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $price = sanitize_input($_POST['price']);
     $description = sanitize_input($_POST['description']);
     $category_id = intval($_POST['category_id']);
-    
+    $stock_quantity = intval($_POST['stock_quantity']);
+
     // Handle Image Upload
     $image = '';
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $upload_dir = '../uploads/';
         if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-        
+
         $filename = time() . '_' . basename($_FILES['image']['name']);
         $target_file = $upload_dir . $filename;
-        
+
         $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         $allowed = array('jpg', 'jpeg', 'png', 'gif', 'webp');
-        
+
         if (in_array($file_type, $allowed)) {
             if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
                 $image = $filename;
@@ -33,11 +34,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = "Only JPG, JPEG, PNG, GIF, & WEBP files are allowed.";
         }
     }
-    
+
     if (!isset($error)) {
-        $stmt = $conn->prepare("INSERT INTO products (name, price, image, description, category_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sdssi", $name, $price, $image, $description, $category_id);
-        
+        $stmt = $conn->prepare("INSERT INTO products (name, price, image, description, category_id, stock_quantity) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sdssii", $name, $price, $image, $description, $category_id, $stock_quantity);
+
         if ($stmt->execute()) {
             $success = "Product added successfully.";
         } else {
@@ -64,19 +65,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php if (isset($success)): ?>
         <div class="alert alert-success"><?php echo $success; ?></div>
     <?php endif; ?>
-    
+
     <form method="POST" action="" enctype="multipart/form-data">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
             <div class="form-group" style="grid-column: span 2;">
                 <label>Product Name</label>
                 <input type="text" name="name" required placeholder="e.g. Modern Sofa">
             </div>
-            
+
             <div class="form-group">
-                <label>Price ($)</label>
-                <input type="number" step="0.01" name="price" required placeholder="0.00">
+                <label>Price (रु)</label>
+                <input type="number" step="1" name="price" required placeholder="0">
             </div>
-            
+
+            <div class="form-group">
+                <label>Stock Quantity</label>
+                <input type="number" name="stock_quantity" required placeholder="e.g. 50" min="0" value="100">
+            </div>
+
             <div class="form-group">
                 <label>Category</label>
                 <select name="category_id" required>
@@ -86,19 +92,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <?php endwhile; ?>
                 </select>
             </div>
-            
+
             <div class="form-group" style="grid-column: span 2;">
                 <label>Product Image</label>
                 <input type="file" name="image" accept="image/*" required style="padding: 0.5rem; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px;">
                 <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 5px;">Supported formats: JPG, PNG, WEBP, GIF</p>
             </div>
-            
+
             <div class="form-group" style="grid-column: span 2;">
                 <label>Description</label>
                 <textarea name="description" rows="5" placeholder="Describe your product..."></textarea>
             </div>
         </div>
-        
+
         <div style="margin-top: 1rem; text-align: right;">
             <button type="submit" class="btn-fill" style="padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600;">Add Product</button>
         </div>

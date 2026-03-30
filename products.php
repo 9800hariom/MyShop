@@ -7,8 +7,14 @@ $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : 
 $category = isset($_GET['category']) ? intval($_GET['category']) : 0;
 $sort = isset($_GET['sort']) ? $conn->real_escape_string($_GET['sort']) : '';
 
-// Build Query
-$sql = "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1";
+// Build Query with avg rating
+$sql = "SELECT p.*, c.name as category_name,
+        COALESCE(AVG(r.rating),0) as avg_rating,
+        COUNT(r.id) as rating_count
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        LEFT JOIN product_ratings r ON p.id = r.product_id
+        WHERE 1=1";
 
 if ($search) {
     $sql .= " AND p.name LIKE '%$search%'";
@@ -16,6 +22,8 @@ if ($search) {
 if ($category > 0) {
     $sql .= " AND p.category_id = $category";
 }
+
+$sql .= " GROUP BY p.id";
 
 // Sorting logic
 if ($sort === 'price_asc') {
@@ -92,7 +100,26 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY name ASC");
                     echo '<img src="' . $imagePath . '" alt="' . htmlspecialchars($row['name']) . '">';
                     echo '<div class="product-info">';
                     echo '<h3>' . htmlspecialchars($row['name']) . '</h3>';
-                    echo '<p class="price">$' . number_format($row['price'], 2) . '</p>';
+                    // Star rating
+                    $avg   = round((float)$row['avg_rating']);
+                    $count = (int)$row['rating_count'];
+                    $stars = '';
+                    for ($s = 1; $s <= 5; $s++) {
+                        $filled = $s <= $avg ? ' filled' : '';
+                        $stars .= '<span style="color:' . ($s <= $avg ? '#f59e0b' : '#d1d5db') . ';font-size:1rem;">★</span>';
+                    }
+                    echo '<div style="display:flex;justify-content:center;align-items:center;gap:2px;margin-bottom:0.5rem;">' . $stars . '<span style="font-size:0.78rem;color:#718096;margin-left:4px;">(' . $count . ')</span></div>';
+                    // Price
+                    echo '<p class="price">रु ' . number_format($row['price']) . '</p>';
+                    // Stock badge
+                    $qty = (int)$row['stock_quantity'];
+                    if ($qty <= 0) {
+                        echo '<div style="display:inline-block;font-size:0.78rem;font-weight:600;padding:3px 10px;border-radius:20px;background:#fee2e2;color:#991b1b;margin-bottom:0.6rem;">Out of Stock</div>';
+                    } elseif ($qty <= 10) {
+                        echo '<div style="display:inline-block;font-size:0.78rem;font-weight:600;padding:3px 10px;border-radius:20px;background:#fef3c7;color:#92400e;margin-bottom:0.6rem;">Only ' . $qty . ' left!</div>';
+                    } else {
+                        echo '<div style="display:inline-block;font-size:0.78rem;font-weight:600;padding:3px 10px;border-radius:20px;background:#d1fae5;color:#065f46;margin-bottom:0.6rem;">In Stock (' . $qty . ')</div>';
+                    }
                     echo '<a href="product_details.php?id=' . $row['id'] . '" class="btn">View Details</a>';
                     echo '</div>';
                     echo '</div>';
